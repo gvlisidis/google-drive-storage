@@ -8,7 +8,7 @@
             <label for="folder_id">Select Folder</label>
             <select name="folder_id" id="folder_id" class="form-control">
                 @foreach($folders as $folder)
-                    <option value="{{ $folder->google_folder_id }}">{{ $folder->name }}</option>
+                    <option value="{{ $folder->id }}">{{ $folder->name }}</option>
                 @endforeach
             </select>
             <br>

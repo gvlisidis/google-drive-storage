@@ -29,4 +29,8 @@ Route::prefix('files')->as('files.')->group(function (){
     Route::get('', [FileController::class, 'index'])->name('index');
     Route::get('/create-file', [FileController::class, 'create'])->name('create');
     Route::post('', [FileController::class, 'store'])->name('store');
+    Route::post('/{file}/download', [FileController::class, 'download'])->name('download');
+    Route::delete('/{file}/delete', [FileController::class, 'destroy'])->name('delete');
+    Route::get('/{file}/share', [FileController::class, 'share'])->name('share');
+    Route::get('/{file}/move', [FileController::class, 'move'])->name('move');
 });

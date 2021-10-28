@@ -10,5 +10,4 @@ class FileService
     {
         File::create($fileData);
     }
-
 }

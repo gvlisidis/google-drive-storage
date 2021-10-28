@@ -19,8 +19,18 @@ class GoogleStorage
         return new \Google_Service_Drive($this->client);
     }
 
+    public function driveFile()
+    {
+        return new \Google_Service_Drive_DriveFile($this->client);
+    }
+
     public function adapter()
     {
-        
+        return new \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter($this->service(), env('GOOGLE_DRIVE_FOLDER_ID'));
+    }
+
+    public function drivePermission()
+    {
+        return new \Google_Service_Drive_Permission();
     }
 }
