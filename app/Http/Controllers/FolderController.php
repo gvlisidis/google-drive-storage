@@ -20,7 +20,7 @@ class FolderController extends Controller
     public function index()
     {
         return view('folders.index')->with([
-            'folders' => Folder::all(),
+            'folders' => Folder::withCount('files')->get(),
         ]);
     }
 
@@ -37,6 +37,41 @@ class FolderController extends Controller
 
         $this->folderService->createFolder($data);
 
-        return redirect()->route('folders.index');
+        return redirect()->route('folders.index')->with('status', 'Folder created!');
+    }
+
+    public function download(Request $request, Folder $folder)
+    {
+        //
+    }
+
+    public function destroy(Request $request, Folder $folder)
+    {
+        Storage::disk('google')->delete($folder->google_folder_id);
+        $folder->delete();
+
+        return redirect()->route('folders.index')->with('status', 'Folder deleted!');
+    }
+
+    public function share(Folder $folder)
+    {
+      //
+    }
+
+    public function move(Folder $folder)
+    {
+        $this->folderService->moveFolder($folder);
+
+        return redirect()->route('folders.index')->with('status', 'Folder moved!');
+    }
+
+    public function copy(Folder $folder)
+    {
+       //
+    }
+
+    public function rename(Folder $folder)
+    {
+       //
     }
 }

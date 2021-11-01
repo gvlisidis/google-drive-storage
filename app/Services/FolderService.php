@@ -6,6 +6,7 @@ use App\Models\Folder;
 use App\Storage\GoogleStorage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use ZipArchive;
 
 class FolderService
 {
@@ -30,6 +31,27 @@ class FolderService
             'parent_folder_id' => $data['parent_folder_id'] ?: 1,
             'google_folder_id' => $googleFolderId->id
         ]);
+    }
+
+    public function downloadFolder(Folder $folder)
+    {
+        return true;
+    }
+
+    public function moveFolder(Folder $folder)
+    {
+        $to = '121UVv0dkKwOMhwf5B_L8s1mw7YP15QBC';
+
+        $emptyFileMetadata = new \Google_Service_Drive_DriveFile();
+        $service = $this->googleStorage->service();
+        // Retrieve the existing parents to remove
+        $googleFolder  = $service->files->get($folder->google_folder_id, array('fields' => 'parents'));
+        $previousParents = join(',', $googleFolder->parents);
+        // Move the file to the new folder
+        $googleFile = $service->files->update($folder->google_folder_id, $emptyFileMetadata, array(
+            'addParents' => $to,
+            'removeParents' => $previousParents,
+            'fields' => 'id, parents'));
     }
 
     private function createGoogleFolder(array $data, $service)
@@ -62,4 +84,5 @@ class FolderService
 
         return env('GOOGLE_DRIVE_FOLDER_ID');
     }
+
 }

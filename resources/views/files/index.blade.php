@@ -6,6 +6,11 @@
         <div>
             <a href="{{ route('files.create') }}" class="btn btn-success">Create</a>
         </div>
+        @if (session('status'))
+            <div class="alert alert-success" style="margin: 10px 0">
+                {{ session('status') }}
+            </div>
+        @endif
         <table class="table">
             <thead>
                <tr>
@@ -32,7 +37,10 @@
                                 <button class="btn btn-danger">Delete</button>
                             </form>
                             <a href="{{ route('files.share', $file) }}" class="btn btn-primary" style="margin-right: 10px">Share</a>
-                            <a href="{{ route('files.move', $file) }}" class="btn btn-info">Move</a>
+                            <a href="{{ route('files.move', $file) }}" class="btn btn-info" style="margin-right: 10px">Move</a>
+                            <a href="{{ route('files.copy', $file) }}" class="btn btn-info" style="margin-right: 10px">Copy</a>
+                            <a href="{{ route('files.rename', $file) }}" class="btn btn-info" style="margin-right: 10px">Rename</a>
+                            <a href="{{ route('files.watch', $file) }}" class="btn btn-info" style="margin-right: 10px">Watch</a>
                         </td>
                     </tr>
                 @empty

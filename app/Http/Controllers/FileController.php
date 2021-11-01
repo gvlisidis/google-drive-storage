@@ -69,7 +69,7 @@ class FileController extends Controller
 
         $this->fileService->storeToDatabase($newData);
 
-        return redirect()->route('files.index');
+        return redirect()->route('files.index')->with('status', 'File created!');
     }
 
     public function download(Request $request, File $file)
@@ -83,7 +83,7 @@ class FileController extends Controller
         Storage::disk('google')->delete($file->google_file_id);
         $file->delete();
 
-        return redirect()->route('files.index');
+        return redirect()->route('files.index')->with('status', 'File deleted!');
     }
 
     public function share(File $file)
@@ -95,21 +95,83 @@ class FileController extends Controller
 
     public function move(File $file)
     {
-      //  dd($file);
-        $from = '1he-u_z_0VYYEHdsClZmhc-RS3aQobaaJ';
-        $to = '1o-sKX0Wwed3olIRZv7dohpYxdFbus3Xq/1R5ORBkaYf3tO6rEsCEqZk7bb6uyHntdp';
+        $to = '1RrQXpIwEYnK3cTkn_7bAvSThv8-Wcl82';
 
         $emptyFileMetadata = new \Google_Service_Drive_DriveFile();
         $service = $this->googleStorage->service();
         // Retrieve the existing parents to remove
-        $service->files->get($file->google_file_id, array('fields' => 'parents'));
-       // $previousParents = join(',', $from);
+        $googleFile  = $service->files->get($file->google_file_id, array('fields' => 'parents'));
+        $previousParents = join(',', $googleFile->parents);
         // Move the file to the new folder
-        $service->files->update($file->google_file_id, $emptyFileMetadata, array(
+        $googleFile = $service->files->update($file->google_file_id, $emptyFileMetadata, array(
             'addParents' => $to,
-            'removeParents' => $from,
+            'removeParents' => $previousParents,
             'fields' => 'id, parents'));
 
-        return redirect()->route('files.index');
+        return redirect()->route('files.index')->with('status', 'File moved!');
+    }
+
+    public function copy(File $file)
+    {
+        $to = '1rfv8C1XAIEjKHQ-KvxHuVZVxgj65S0xN';
+        $from = '1GuO7eYYk6hcZImOUAA7cd1UI7kHn0l3O';
+
+
+        $fileMetadata = new \Google_Service_Drive_DriveFile();
+        $service = $this->googleStorage->service();
+        // Retrieve the existing parents to remove
+
+        $fileMetadata->setParents([
+            $to
+        ]);
+        $fileMetadata->setName($file->name);
+
+        $newFile = $service->files->copy($file->google_file_id, $fileMetadata,[
+            'fields' => 'id, parents'
+        ]);
+
+        $data = [
+            'user_id' => null,
+            'folder_id' => Folder::query()->where('google_folder_id', $from)->first()->id,
+            'name' => $file->name,
+            'google_file_id' => $newFile->id
+        ];
+
+        $this->fileService->storeToDatabase($data);
+
+        return redirect()->route('files.index')->with('status', 'File copied!');
+    }
+
+    public function rename(File $file)
+    {
+        $newName = 'The Very New Name';
+        $fileMetadata = new \Google_Service_Drive_DriveFile();
+        $fileMetadata->setName($newName);
+        $service = $this->googleStorage->service();
+        $service->files->update($file->google_file_id, $fileMetadata,[
+            'fields' => 'id'
+        ]);
+
+        $data = [
+            'user_id' => null,
+            'folder_id' => $file->folder_id,
+            'name' => $newName,
+            'google_file_id' => $file->google_file_id,
+        ];
+
+        $this->fileService->updateInDatabase($file, $data);
+
+        return redirect()->route('files.index')->with('status', 'File renamed!');
+    }
+
+    public function watch(File $file)
+    {
+        $fileMetadata = new \Google_Service_Drive_DriveFile();
+        $service = $this->googleStorage->service();
+        $test = $service->files->watch($file->google_file_id, $fileMetadata,[
+            'fields' => 'id'
+        ]);
+
+        dd($test);
     }
 }

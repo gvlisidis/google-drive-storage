@@ -18,7 +18,7 @@ class CreateFilesTable extends Migration
             $table->string('google_file_id');
             $table->string('name');
             $table->string('type')->nullable();
-            $table->foreignId('folder_id')->nullable()->constrained();
+            $table->foreignId('folder_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained();
             $table->timestamps();
         });

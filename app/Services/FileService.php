@@ -10,4 +10,9 @@ class FileService
     {
         File::create($fileData);
     }
+
+    public function updateInDatabase(File $file, array $fileData)
+    {
+        $file->update($fileData);
+    }
 }
